@@ -4,6 +4,9 @@ use std::fmt;
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 /// (`ftyp`) Identifier of an atom information about the filetype.
 pub(crate) const FILETYPE: Fourcc = Fourcc(*b"ftyp");
 /// (`mdat`)
@@ -166,6 +169,7 @@ pub fn idents_match(a: &impl Ident, b: &impl Ident) -> bool {
 }
 
 /// A 4 byte atom identifier (four character code).
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Default, Eq, PartialEq)]
 pub struct Fourcc(pub [u8; 4]);
 
@@ -264,6 +268,7 @@ impl<'a> FreeformIdent<'a> {
 }
 
 /// An identifier for data.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DataIdent {
     /// A standard identifier containing a 4 byte atom identifier.

@@ -5,6 +5,9 @@ use std::io::{BufReader, Read, Seek, Write};
 use std::path::Path;
 use std::rc::Rc;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::{
     atom, ident, AdvisoryRating, AudioInfo, Data, DataIdent, Ident, Img, ImgBuf, ImgFmt, ImgMut,
     ImgRef, MediaType, MetaItem,
@@ -17,6 +20,7 @@ mod readonly;
 mod tuple;
 
 /// A MPEG-4 audio tag containing metadata atoms
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct Tag {
     /// The `ftyp` atom.

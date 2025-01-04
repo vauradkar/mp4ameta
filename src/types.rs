@@ -2,6 +2,9 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::time::Duration;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::ErrorKind;
 
 // iTunes media type indices
@@ -191,6 +194,7 @@ impl fmt::Display for AdvisoryRating {
 }
 
 /// An enum representing the channel configuration of an MPEG-4 audio track.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ChannelConfig {
     /// Mono
@@ -259,6 +263,7 @@ impl fmt::Display for ChannelConfig {
 }
 
 /// An enum representing the sample rate of an MPEG-4 audio track.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SampleRate {
     /// A Sample rate of 96000Hz
@@ -343,6 +348,7 @@ impl SampleRate {
 }
 
 /// A struct containing information about a mp4 track.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct AudioInfo {
     /// The duration of the track.

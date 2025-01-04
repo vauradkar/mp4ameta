@@ -9,7 +9,11 @@
 //! └─ data
 use super::*;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 /// A struct representing a metadata item, containing data that is associated with an identifier.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MetaItem {
     /// The identifier of the atom.

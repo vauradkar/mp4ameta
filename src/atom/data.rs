@@ -1,5 +1,8 @@
 use std::fmt;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::{Img, ImgBuf, ImgFmt, ImgMut, ImgRef};
 
 use super::*;
@@ -86,6 +89,7 @@ const AFFINE_TRANSFORM_F64: u32 = 79;
 
 /// An enum that holds different types of data defined by
 /// [Table 3-5 Well-known data types](https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/Metadata/Metadata.html#//apple_ref/doc/uid/TP40000939-CH1-SW34).
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Eq, PartialEq)]
 pub enum Data {
     /// A value containing reserved type data inside a `Vec<u8>`.
