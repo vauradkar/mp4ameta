@@ -12,6 +12,7 @@ mod readonly;
 mod userdata;
 
 /// A tag containing MPEG-4 audio metadata.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Tag {
     /// The filetype (`ftyp`) atom.

@@ -214,6 +214,7 @@ pub fn idents_match(a: &impl Ident, b: &impl Ident) -> bool {
 }
 
 /// A 4 byte atom identifier (four character code).
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
 pub struct Fourcc(pub [u8; 4]);
 
@@ -380,6 +381,7 @@ impl<'a> FreeformIdentBorrowed<'a> {
 
 /// The identifier used to store metadata inside an item list.
 /// Either a [`Fourcc`] or an freeform identifier.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DataIdent {
     /// A standard identifier containing a 4 byte atom identifier.

@@ -114,6 +114,7 @@ impl fmt::Display for AdvisoryRating {
 }
 
 /// The channel configuration of an MPEG-4 audio track.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ChannelConfig {
     /// 1.0, channel: front-center.
@@ -190,6 +191,7 @@ impl fmt::Display for ChannelConfig {
 }
 
 /// An enum representing the sample rate of an MPEG-4 audio track.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SampleRate {
     /// A Sample rate of 96000Hz
@@ -288,6 +290,7 @@ impl fmt::Display for SampleRate {
 }
 
 /// Audio information of an mp4 track.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct AudioInfo {
     /// The duration of the track.
@@ -376,6 +379,7 @@ impl ImgFmt {
 /// For chapter lists this limit is 255 ([`u8::MAX`]);
 /// For chapter tracks this limit is 65535 ([`u16::MAX`]);
 /// If this limit is exceeded the title is truncated.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Chapter {
     /// The start of the chapter.

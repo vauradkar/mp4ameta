@@ -11,5 +11,13 @@ repository = "https://github.com/Saecki/rust-mp4ameta"
 edition = "2024"
 include = ["src", "LICENSE-APACHE", "LICENSE-MIT"]
 
+[features]
+## Allow serializing and deserializing tags
+serde = ["dep:serde"]
+
+[dependencies]
+serde = { version = "1.0.217", features = ["derive"], optional = true }
+
 [dev-dependencies]
 walkdir = "2.5.0"
+serde_json = "1.0.134"

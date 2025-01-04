@@ -16,6 +16,7 @@ mod genre;
 mod tuple;
 
 /// User defined MPEG-4 audio metadata that can be modified.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Userdata {
     pub(crate) meta_items: Vec<MetaItem>,
