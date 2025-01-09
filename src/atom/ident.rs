@@ -1,10 +1,12 @@
 use std::array::TryFromSliceError;
 use std::borrow::Cow;
+use std::collections::HashMap;
 use std::convert::TryInto;
 use std::fmt::{self, Write};
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
+use std::sync::LazyLock;
 
 /// (`ftyp`) Identifier of an atom information about the filetype.
 pub(crate) const FILETYPE: Fourcc = Fourcc(*b"ftyp");
@@ -199,6 +201,95 @@ pub const LYRICIST: FreeformIdentStatic = FreeformIdent::new_static(APPLE_ITUNES
 /// (`----:com.apple.iTunes:LABEL`)
 pub const LABEL: FreeformIdentStatic = FreeformIdent::new_static(APPLE_ITUNES_MEAN, "LABEL");
 
+pub(crate) static TUP: LazyLock<Vec<(&str, DataIdent)>> = LazyLock::new(|| {
+    vec![
+        ("Filetype", DataIdent::Fourcc(FILETYPE)),
+        ("Media Data", DataIdent::Fourcc(MEDIA_DATA)),
+        ("Movie", DataIdent::Fourcc(MOVIE)),
+        ("Movie Header", DataIdent::Fourcc(MOVIE_HEADER)),
+        ("Track", DataIdent::Fourcc(TRACK)),
+        ("Media", DataIdent::Fourcc(MEDIA)),
+        ("Media Information", DataIdent::Fourcc(MEDIA_INFORMATION)),
+        ("Sample Table", DataIdent::Fourcc(SAMPLE_TABLE)),
+        ("Sample Table Chunk Offset", DataIdent::Fourcc(SAMPLE_TABLE_CHUNK_OFFSET)),
+        ("Sample Table Chunk Offset 64", DataIdent::Fourcc(SAMPLE_TABLE_CHUNK_OFFSET_64)),
+        ("Sample Table Sample Description", DataIdent::Fourcc(SAMPLE_TABLE_SAMPLE_DESCRIPTION)),
+        ("Mp4 Audio", DataIdent::Fourcc(MP4_AUDIO)),
+        ("Elementary Stream Description", DataIdent::Fourcc(ELEMENTARY_STREAM_DESCRIPTION)),
+        ("User Data", DataIdent::Fourcc(USER_DATA)),
+        ("Metadata", DataIdent::Fourcc(METADATA)),
+        ("Handler Reference", DataIdent::Fourcc(HANDLER_REFERENCE)),
+        ("Item List", DataIdent::Fourcc(ITEM_LIST)),
+        ("Data", DataIdent::Fourcc(DATA)),
+        ("Mean", DataIdent::Fourcc(MEAN)),
+        ("Name", DataIdent::Fourcc(NAME)),
+        ("Free", DataIdent::Fourcc(FREE)),
+        ("Freeform", DataIdent::Fourcc(FREEFORM)),
+        ("Advisory Rating", DataIdent::Fourcc(ADVISORY_RATING)),
+        ("Album", DataIdent::Fourcc(ALBUM)),
+        ("Album Artist", DataIdent::Fourcc(ALBUM_ARTIST)),
+        ("Artist", DataIdent::Fourcc(ARTIST)),
+        ("Artwork", DataIdent::Fourcc(ARTWORK)),
+        ("Bpm", DataIdent::Fourcc(BPM)),
+        ("Comment", DataIdent::Fourcc(COMMENT)),
+        ("Compilation", DataIdent::Fourcc(COMPILATION)),
+        ("Composer", DataIdent::Fourcc(COMPOSER)),
+        ("Copyright", DataIdent::Fourcc(COPYRIGHT)),
+        ("Custom Genre", DataIdent::Fourcc(CUSTOM_GENRE)),
+        ("Disc Number", DataIdent::Fourcc(DISC_NUMBER)),
+        ("Encoder", DataIdent::Fourcc(ENCODER)),
+        ("Standard Genre", DataIdent::Fourcc(STANDARD_GENRE)),
+        ("Title", DataIdent::Fourcc(TITLE)),
+        ("Track Number", DataIdent::Fourcc(TRACK_NUMBER)),
+        ("Year", DataIdent::Fourcc(YEAR)),
+        ("Grouping", DataIdent::Fourcc(GROUPING)),
+        ("Media Type", DataIdent::Fourcc(MEDIA_TYPE)),
+        ("Category", DataIdent::Fourcc(CATEGORY)),
+        ("Keyword", DataIdent::Fourcc(KEYWORD)),
+        ("Podcast", DataIdent::Fourcc(PODCAST)),
+        ("Podcast Episode Global Unique Id", DataIdent::Fourcc(PODCAST_EPISODE_GLOBAL_UNIQUE_ID)),
+        ("Podcast Url", DataIdent::Fourcc(PODCAST_URL)),
+        ("Description", DataIdent::Fourcc(DESCRIPTION)),
+        ("Lyrics", DataIdent::Fourcc(LYRICS)),
+        ("Tv Episode", DataIdent::Fourcc(TV_EPISODE)),
+        ("Tv Episode Name", DataIdent::Fourcc(TV_EPISODE_NAME)),
+        ("Tv Network Name", DataIdent::Fourcc(TV_NETWORK_NAME)),
+        ("Tv Season", DataIdent::Fourcc(TV_SEASON)),
+        ("Tv Show Name", DataIdent::Fourcc(TV_SHOW_NAME)),
+        ("Purchase Date", DataIdent::Fourcc(PURCHASE_DATE)),
+        ("Gapless Playback", DataIdent::Fourcc(GAPLESS_PLAYBACK)),
+        ("Movement", DataIdent::Fourcc(MOVEMENT)),
+        ("Movement Count", DataIdent::Fourcc(MOVEMENT_COUNT)),
+        ("Movement Index", DataIdent::Fourcc(MOVEMENT_INDEX)),
+        ("Work", DataIdent::Fourcc(WORK)),
+        ("Show Movement", DataIdent::Fourcc(SHOW_MOVEMENT)),
+        ("Isrc", DataIdent::Freeform { mean: ISRC.mean.into(), name: ISRC.name.into() }),
+        (
+            "Lyricist",
+            DataIdent::Freeform {
+                mean: LYRICIST.mean.into(),
+                name: LYRICIST.name.into(),
+            },
+        ),
+    ]
+});
+
+pub static NAME_TO_DATA_IDENT: LazyLock<HashMap<String, DataIdent>> = LazyLock::new(|| {
+    let mut hm = HashMap::new();
+    for (k, v) in TUP.iter() {
+        hm.insert(k.to_string(), v.clone());
+    }
+    hm
+});
+
+pub static DATA_IDENT_TO_NAME: LazyLock<HashMap<DataIdent, String>> = LazyLock::new(|| {
+    let mut hm = HashMap::new();
+    for (k, v) in TUP.iter() {
+        hm.insert(v.clone(), k.to_string());
+    }
+    hm
+});
+
 /// A trait providing information about an identifier.
 pub trait Ident: PartialEq<DataIdent> {
     /// Returns a 4 byte atom identifier.
@@ -215,7 +306,7 @@ pub fn idents_match(a: &impl Ident, b: &impl Ident) -> bool {
 
 /// A 4 byte atom identifier (four character code).
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct Fourcc(pub [u8; 4]);
 
 impl Deref for Fourcc {
@@ -382,7 +473,7 @@ impl<'a> FreeformIdentBorrowed<'a> {
 /// The identifier used to store metadata inside an item list.
 /// Either a [`Fourcc`] or an freeform identifier.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DataIdent {
     /// A standard identifier containing a 4 byte atom identifier.
     Fourcc(Fourcc),
@@ -457,5 +548,15 @@ impl DataIdent {
     /// the 4-byte identifier.
     pub const fn fourcc(bytes: [u8; 4]) -> Self {
         Self::Fourcc(Fourcc(bytes))
+    }
+
+    /// Tries to get friendly name for a given data ident. Names are in title case
+    pub fn friendly_name(&self) -> Option<String> {
+        DATA_IDENT_TO_NAME.get(self).map(|s| s.to_owned())
+    }
+
+    /// Tries to build data ident from given friendly name in title case
+    pub fn from_friendly_name(name: &str) -> Option<Self> {
+        NAME_TO_DATA_IDENT.get(name).map(|d| d.to_owned())
     }
 }
